@@ -1,0 +1,407 @@
+function getGmailEmails(){
+//Yess
+var label = GmailApp.getUserLabelByName('Co-Bris-Yes');
+var threads=label.getThreads();
+
+//i is the number of messages in the label
+for(var i = threads.length - 1; i >=0; i--){
+  //inserting a row for the Yes
+  var activeSheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var dataRange = activeSheet.getDataRange();
+  var values = dataRange.getValues();
+  //storing the row of interest
+  var messages = threads[i].getMessages();
+
+  //n indicates which sender in the thread
+  for (var n = 0; n < messages.length; n++) {
+    var message = messages[n];
+    var senderDetails_raw=message.getFrom()
+    var senderDetails=message.getFrom().substring(senderDetails_raw.indexOf("<")+1,senderDetails_raw.indexOf(">"));
+    var name_raw=message.getFrom().toString().toLowerCase();
+    var name=name_raw.substring(0,name_raw.indexOf("<")-1).replace(/[".,\/#!$%\^&\*;:{}=\-_`~()"']/g,"");
+
+    if (name_raw.includes("innovatus")){
+      Logger.log(name_raw + " is being skipped");
+      continue
+
+    }     
+      
+    Logger.log("the " + "YES" + " email being checked is "+senderDetails)
+    //k indicates which row in the sheet is being checked for the particular n
+      
+   //change k back to var k = 0; k < values.length; k++ after testing
+          
+    for (var k = 0; k < values.length; k++) {
+           
+      if ((values[k][1].toString().toLowerCase() + values[k][2].toString().toLowerCase()).includes(name.split(" ")[0]) &&
+      (values[k][1].toString().toLowerCase() + values[k][2].toString().toLowerCase()).includes(name.split(" ")[name.split(" ").length-1]) &&
+       (values[k][0].toString().toLowerCase() !== "yes")
+       
+       ||
+
+       ( values[k][5].toString().toLowerCase() == senderDetails.toString().toLowerCase() && values[k][0].toString().toLowerCase() != "yes"))
+      
+      {
+        //j is index that locates the cluster of this label
+
+        loop2:
+        for (var j = 0; j < values.length; j++) {  
+          if (values[j][0].toString().toLowerCase() == "yes" && values[j+1][0].toString().toLowerCase() != "yes") {
+            activeSheet.insertRows(j+2,1)
+            pasterange=[j+2]
+            Logger.log("pasterange is " + pasterange)
+            break loop2;
+          }
+        }
+
+        //since we inserted a new row, we need to add 1 to all the below k
+        //pasterange is used here here because this is the paste range, the place where we inserted a new row under the cluster that this guy belongs to
+        var range = activeSheet.getRange("A"+String(pasterange)+":F"+String(pasterange));
+
+        row = values[k].slice(0,6);
+        row[0]="yes"
+        Logger.log("the row that will be pasted is: " + row)
+        Logger.log("the paste range is: " + values[pasterange] + " of row " + pasterange)
+        
+        range.setValues([row]);        
+        //threads[i].removeLabel(label)
+
+        //deleting the updated row
+        Logger.log("the row that will be deleted is: " + values[k][5] +", with row " + [k])
+        activeSheet.deleteRow([k+2])
+        
+        //you'll always update the next iteration with a version of the sheet that is consistent with the most recent action of the previous iteration
+        var activeSheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+        var dataRange = activeSheet.getDataRange();
+        var values = dataRange.getValues();                                
+      }
+    }
+  }
+}
+
+//Nos
+var label = GmailApp.getUserLabelByName('Co-Bris-No');
+var threads=label.getThreads();
+
+//i is the number of messages in the label
+for(var i = threads.length - 1; i >=0; i--){
+  //inserting a row for the No
+  var activeSheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var dataRange = activeSheet.getDataRange();
+  var values = dataRange.getValues();
+  //storing the row of interest
+  var messages = threads[i].getMessages();
+
+  //n indicates which sender in the thread
+  for (var n = 0; n < messages.length; n++) {
+    var message = messages[n];
+    var senderDetails_raw=message.getFrom()
+    var senderDetails=message.getFrom().substring(senderDetails_raw.indexOf("<")+1,senderDetails_raw.indexOf(">"));
+    var name_raw=message.getFrom().toString().toLowerCase();
+    var name=name_raw.substring(0,name_raw.indexOf("<")-1).replace(/[".,\/#!$%\^&\*;:{}=\-_`~()"']/g,"");
+
+    if (name_raw.includes("innovatus")){
+      Logger.log(name_raw + " is being skipped");
+      continue
+
+    }     
+      
+    Logger.log("the " + "NO" + " email being checked is "+senderDetails)
+    //k indicates which row in the sheet is being checked for the particular n
+      
+   //change k back to var k = 0; k < values.length; k++ after testing
+          
+    for (var k = 0; k < values.length; k++) {
+           
+      if ((values[k][1].toString().toLowerCase() + values[k][2].toString().toLowerCase()).includes(name.split(" ")[0]) &&
+      (values[k][1].toString().toLowerCase() + values[k][2].toString().toLowerCase()).includes(name.split(" ")[name.split(" ").length-1]) &&
+       (values[k][0].toString().toLowerCase() !== "no")
+       
+       ||
+
+       ( values[k][5].toString().toLowerCase() == senderDetails.toString().toLowerCase() && values[k][0].toString().toLowerCase() != "no"))
+      
+      {
+        //j is index that locates the cluster of this label
+
+        loop2:
+        for (var j = 0; j < values.length; j++) {  
+          if (values[j][0].toString().toLowerCase() == "no" && values[j+1][0].toString().toLowerCase() != "no") {
+            activeSheet.insertRows(j+2,1)
+            pasterange=[j+2]
+            Logger.log("pasterange is " + pasterange)
+            break loop2;
+          }
+        }
+
+        //since we inserted a new row, we need to add 1 to all the below k
+        //pasterange is used here here because this is the paste range, the place where we inserted a new row under the cluster that this guy belongs to
+        var range = activeSheet.getRange("A"+String(pasterange)+":F"+String(pasterange));
+
+        row = values[k].slice(0,6);
+        row[0]="NO"
+        Logger.log("the row that will be pasted is: " + row)
+        Logger.log("the paste range is: " + values[pasterange] + " of row " + pasterange)
+        
+        range.setValues([row]);        
+        //threads[i].removeLabel(label)
+
+        //deleting the updated row
+        Logger.log("the row that will be deleted is: " + values[k][5] +", with row " + [k])
+        activeSheet.deleteRow([k+2])
+        
+        //you'll always update the next iteration with a version of the sheet that is consistent with the most recent action of the previous iteration
+        var activeSheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+        var dataRange = activeSheet.getDataRange();
+        var values = dataRange.getValues();                                
+      }
+    }
+  }
+}
+
+
+
+
+//unsubs
+var label = GmailApp.getUserLabelByName('Co-Bris-Unsub');
+var threads=label.getThreads();
+
+//i is the number of messages in the label
+for(var i = threads.length - 1; i >=0; i--){
+  //inserting a row for the Unsub
+  var activeSheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var dataRange = activeSheet.getDataRange();
+  var values = dataRange.getValues();
+  //storing the row of interest
+  var messages = threads[i].getMessages();
+
+  //n indicates which sender in the thread
+  for (var n = 0; n < messages.length; n++) {
+    var message = messages[n];
+    var senderDetails_raw=message.getFrom()
+    var senderDetails=message.getFrom().substring(senderDetails_raw.indexOf("<")+1,senderDetails_raw.indexOf(">"));
+    var name_raw=message.getFrom().toString().toLowerCase();
+    var name=name_raw.substring(0,name_raw.indexOf("<")-1).replace(/[".,\/#!$%\^&\*;:{}=\-_`~()"']/g,"");
+
+    if (name_raw.includes("innovatus")){
+      Logger.log(name_raw + " is being skipped");
+      continue
+
+    }     
+      
+    Logger.log("the " + "UNSUB" + " email being checked is "+senderDetails)
+    //k indicates which row in the sheet is being checked for the particular n
+      
+   //change k back to var k = 0; k < values.length; k++ after testing
+          
+    for (var k = 0; k < values.length; k++) {
+           
+      if ((values[k][1].toString().toLowerCase() + values[k][2].toString().toLowerCase()).includes(name.split(" ")[0]) &&
+      (values[k][1].toString().toLowerCase() + values[k][2].toString().toLowerCase()).includes(name.split(" ")[name.split(" ").length-1]) &&
+       (values[k][0].toString().toLowerCase() !== "unsub")
+       
+       ||
+
+       ( values[k][5].toString().toLowerCase() == senderDetails.toString().toLowerCase() && values[k][0].toString().toLowerCase() != "unsub"))
+      
+      {
+        //j is index that locates the cluster of this label
+
+        loop2:
+        for (var j = 0; j < values.length; j++) {  
+          if (values[j][0].toString().toLowerCase() == "unsub" && values[j+1][0].toString().toLowerCase() != "unsub") {
+            activeSheet.insertRows(j+2,1)
+            pasterange=[j+2]
+            Logger.log("pasterange is " + pasterange)
+            break loop2;
+          }
+        }
+
+        //since we inserted a new row, we need to add 1 to all the below k
+        //pasterange is used here here because this is the paste range, the place where we inserted a new row under the cluster that this guy belongs to
+        var range = activeSheet.getRange("A"+String(pasterange)+":F"+String(pasterange));
+
+        row = values[k].slice(0,6);
+        row[0]="UNSUB"
+        Logger.log("the row that will be pasted is: " + row)
+        Logger.log("the paste range is: " + values[pasterange] + " of row " + pasterange)
+        
+        range.setValues([row]);        
+        //threads[i].removeLabel(label)
+
+        //deleting the updated row
+        Logger.log("the row that will be deleted is: " + values[k][5] +", with row " + [k])
+        activeSheet.deleteRow([k+2])
+        
+        //you'll always update the next iteration with a version of the sheet that is consistent with the most recent action of the previous iteration
+        var activeSheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+        var dataRange = activeSheet.getDataRange();
+        var values = dataRange.getValues();                                
+      }
+    }
+  }
+}
+
+
+//OOOs
+var label = GmailApp.getUserLabelByName('Co-Bris-OOO');
+var threads=label.getThreads();
+
+//i is the number of messages in the label
+for(var i = threads.length - 1; i >=0; i--){
+  //inserting a row for the OOO
+  var activeSheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var dataRange = activeSheet.getDataRange();
+  var values = dataRange.getValues();
+  //storing the row of interest
+  var messages = threads[i].getMessages();
+
+  //n indicates which sender in the thread
+  for (var n = 0; n < messages.length; n++) {
+    var message = messages[n];
+    var senderDetails_raw=message.getFrom()
+    var senderDetails=message.getFrom().substring(senderDetails_raw.indexOf("<")+1,senderDetails_raw.indexOf(">"));
+    var name_raw=message.getFrom().toString().toLowerCase();
+    var name=name_raw.substring(0,name_raw.indexOf("<")-1).replace(/[".,\/#!$%\^&\*;:{}=\-_`~()"']/g,"");
+
+    if (name_raw.includes("innovatus")){
+      Logger.log(name_raw + " is being skipped");
+      continue
+
+    }     
+      
+    Logger.log("the " + "OOO" + " email being checked is "+senderDetails)
+    //k indicates which row in the sheet is being checked for the particular n
+      
+   //change k back to var k = 0; k < values.length; k++ after testing
+          
+    for (var k = 0; k < values.length; k++) {
+           
+      if ((values[k][1].toString().toLowerCase() + values[k][2].toString().toLowerCase()).includes(name.split(" ")[0]) &&
+      (values[k][1].toString().toLowerCase() + values[k][2].toString().toLowerCase()).includes(name.split(" ")[name.split(" ").length-1]) &&
+       (values[k][0].toString().toLowerCase() !== "OOO")
+       
+       ||
+
+       ( values[k][5].toString().toLowerCase() == senderDetails.toString().toLowerCase() && values[k][0].toString().toLowerCase() != "OOO"))
+      
+      {
+        //j is index that locates the cluster of this label
+
+        loop2:
+        for (var j = 0; j < values.length; j++) {  
+          if (values[j][0].toString().toLowerCase() == "OOO" && values[j+1][0].toString().toLowerCase() != "OOO") {
+            activeSheet.insertRows(j+2,1)
+            pasterange=[j+2]
+            Logger.log("pasterange is " + pasterange)
+            break loop2;
+          }
+        }
+
+        //since we inserted a new row, we need to add 1 to all the below k
+        //pasterange is used here here because this is the paste range, the place where we inserted a new row under the cluster that this guy belongs to
+        var range = activeSheet.getRange("A"+String(pasterange)+":F"+String(pasterange));
+
+        row = values[k].slice(0,6);
+        row[0]="OOO"
+        Logger.log("the row that will be pasted is: " + row)
+        Logger.log("the paste range is: " + values[pasterange] + " of row " + pasterange)
+        
+        range.setValues([row]);        
+        //threads[i].removeLabel(label)
+
+        //deleting the updated row
+        Logger.log("the row that will be deleted is: " + values[k][5] +", with row " + [k])
+        activeSheet.deleteRow([k+2])
+        
+        //you'll always update the next iteration with a version of the sheet that is consistent with the most recent action of the previous iteration
+        var activeSheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+        var dataRange = activeSheet.getDataRange();
+        var values = dataRange.getValues();                                
+      }
+    }
+  }
+}
+
+
+//lefts
+var label = GmailApp.getUserLabelByName('Co-Bris-Left');
+var threads=label.getThreads();
+
+//i is the number of messages in the label
+for(var i = threads.length - 1; i >=0; i--){
+  //inserting a row for the Left
+  var activeSheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var dataRange = activeSheet.getDataRange();
+  var values = dataRange.getValues();
+  //storing the row of interest
+  var messages = threads[i].getMessages();
+
+  //n indicates which sender in the thread
+  for (var n = 0; n < messages.length; n++) {
+    var message = messages[n];
+    var senderDetails_raw=message.getFrom()
+    var senderDetails=message.getFrom().substring(senderDetails_raw.indexOf("<")+1,senderDetails_raw.indexOf(">"));
+    var name_raw=message.getFrom().toString().toLowerCase();
+    var name=name_raw.substring(0,name_raw.indexOf("<")-1).replace(/[".,\/#!$%\^&\*;:{}=\-_`~()"']/g,"");
+
+    if (name_raw.includes("innovatus")){
+      Logger.log(name_raw + " is being skipped");
+      continue
+
+    }     
+      
+    Logger.log("the " + "LEFT" + " email being checked is "+senderDetails)
+    //k indicates which row in the sheet is being checked for the particular n
+      
+   //change k back to var k = 0; k < values.length; k++ after testing
+          
+    for (var k = 0; k < values.length; k++) {
+           
+      if ((values[k][1].toString().toLowerCase() + values[k][2].toString().toLowerCase()).includes(name.split(" ")[0]) &&
+      (values[k][1].toString().toLowerCase() + values[k][2].toString().toLowerCase()).includes(name.split(" ")[name.split(" ").length-1]) &&
+       (values[k][0].toString().toLowerCase() !== "left")
+       
+       ||
+
+       ( values[k][5].toString().toLowerCase() == senderDetails.toString().toLowerCase() && values[k][0].toString().toLowerCase() != "left"))
+      
+      {
+        //j is index that locates the cluster of this label
+
+        loop2:
+        for (var j = 0; j < values.length; j++) {  
+          if (values[j][0].toString().toLowerCase() == "left" && values[j+1][0].toString().toLowerCase() != "left") {
+            activeSheet.insertRows(j+2,1)
+            pasterange=[j+2]
+            Logger.log("pasterange is " + pasterange)
+            break loop2;
+          }
+        }
+
+        //since we inserted a new row, we need to add 1 to all the below k
+        //pasterange is used here here because this is the paste range, the place where we inserted a new row under the cluster that this guy belongs to
+        var range = activeSheet.getRange("A"+String(pasterange)+":F"+String(pasterange));
+
+        row = values[k].slice(0,6);
+        row[0]="LEFT"
+        Logger.log("the row that will be pasted is: " + row)
+        Logger.log("the paste range is: " + values[pasterange] + " of row " + pasterange)
+        
+        range.setValues([row]);        
+        //threads[i].removeLabel(label)
+
+        //deleting the updated row
+        Logger.log("the row that will be deleted is: " + values[k][5] +", with row " + [k])
+        activeSheet.deleteRow([k+2])
+        
+        //you'll always update the next iteration with a version of the sheet that is consistent with the most recent action of the previous iteration
+        var activeSheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+        var dataRange = activeSheet.getDataRange();
+        var values = dataRange.getValues();                                
+      }
+    }
+  }
+}
+
+}

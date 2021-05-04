@@ -4,19 +4,17 @@ function getGmailEmails(){
 var tags= ["Yes","No","OOO","Unsub"]
 
 
-
-
 for (var l = 0; l<tags.length; l++){
   //l is the index of which tag is being processed at the moment
 
-  Logger.log('Nutan-6th-'+tags[l])
-  var label = GmailApp.getUserLabelByName('Nutan-6th-'+tags[l]);
+  Logger.log(tags[l])
+  var label = GmailApp.getUserLabelByName(tags[l]);
   var threads=label.getThreads();
 
   //i is the number of messages in the label
   for(var i = threads.length - 1; i >=0; i--){
     //inserting a row for the tags[l]
-    var activeSheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var activeSheet = SpreadsheetApp.getActive().getSheetByName("Jason's playground");
     var dataRange = activeSheet.getDataRange();
     var values = dataRange.getValues();
     //storing the row of interest
@@ -81,7 +79,7 @@ for (var l = 0; l<tags.length; l++){
           activeSheet.deleteRow([k+2])
           
           //you'll always update the next iteration with a version of the sheet that is consistent with the most recent action of the previous iteration
-          var activeSheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+          var activeSheet = SpreadsheetApp.getActive().getSheetByName("Jason's playground");
           var dataRange = activeSheet.getDataRange();
           var values = dataRange.getValues();                                
         }
@@ -93,11 +91,11 @@ for (var l = 0; l<tags.length; l++){
 
 
 
-
+//bounces hasnt been specified to jason's playground
 function bounces(){
 
 
-  var label = GmailApp.getUserLabelByName('Nutan-6th-BB');
+  var label = GmailApp.getUserLabelByName('BB');
   var threads=label.getThreads();
   var activeSheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   var dataRange = activeSheet.getDataRange();

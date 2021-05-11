@@ -1,7 +1,9 @@
 function getGmailEmails(){
 
 
-var tags= ["Yes","No","OOO","Unsub"]
+var tags= ["Yes","No","OOO","Unsub","Questions"]
+
+
 
 
 for (var l = 0; l<tags.length; l++){
@@ -14,7 +16,7 @@ for (var l = 0; l<tags.length; l++){
   //i is the number of messages in the label
   for(var i = threads.length - 1; i >=0; i--){
     //inserting a row for the tags[l]
-    var activeSheet = SpreadsheetApp.getActive().getSheetByName("Jason's playground");
+    var activeSheet = SpreadsheetApp.getActive().getSheetByName("Invitation List");
     var dataRange = activeSheet.getDataRange();
     var values = dataRange.getValues();
     //storing the row of interest
@@ -41,11 +43,7 @@ for (var l = 0; l<tags.length; l++){
             
       for (var k = 0; k < values.length; k++) {
             
-        if ((values[k][1].toString().toLowerCase() + values[k][2].toString().toLowerCase()).includes(name.split(" ")[0]) &&
-        (values[k][1].toString().toLowerCase() + values[k][2].toString().toLowerCase()).includes(name.split(" ")[name.split(" ").length-1]) &&
-        (values[k][0].toString().toLowerCase() !== tags[l].toLowerCase())
-        
-        ||
+        if (
 
         ( values[k][5].toString().toLowerCase() == senderDetails.toString().toLowerCase() && values[k][0].toString().toLowerCase() != tags[l].toLowerCase()))
         
@@ -79,13 +77,19 @@ for (var l = 0; l<tags.length; l++){
           activeSheet.deleteRow([k+2])
           
           //you'll always update the next iteration with a version of the sheet that is consistent with the most recent action of the previous iteration
-          var activeSheet = SpreadsheetApp.getActive().getSheetByName("Jason's playground");
+          var activeSheet = SpreadsheetApp.getActive().getSheetByName("Invitation List");
           var dataRange = activeSheet.getDataRange();
-          var values = dataRange.getValues();                                
+          var values = dataRange.getValues();
+
+          GmailApp.starMessage(message)
+
         }
+        
+
       }
     }
   }
 }
 }
+
 

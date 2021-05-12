@@ -1,7 +1,7 @@
 function getGmailEmails(){
 
 
-var tags= ["Yes","No","OOO","Unsub"]
+var tags= ["Yes","No","OOO","Unsub","Questions"]
 
 
 
@@ -9,14 +9,14 @@ var tags= ["Yes","No","OOO","Unsub"]
 for (var l = 0; l<tags.length; l++){
   //l is the index of which tag is being processed at the moment
 
-  Logger.log('Nutan-6th-'+tags[l])
-  var label = GmailApp.getUserLabelByName('Nutan-6th-'+tags[l]);
+  Logger.log(tags[l])
+  var label = GmailApp.getUserLabelByName(tags[l]);
   var threads=label.getThreads();
 
   //i is the number of messages in the label
   for(var i = threads.length - 1; i >=0; i--){
     //inserting a row for the tags[l]
-    var activeSheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var activeSheet = SpreadsheetApp.getActive().getSheetByName("Invitation List");
     var dataRange = activeSheet.getDataRange();
     var values = dataRange.getValues();
     //storing the row of interest
@@ -36,18 +36,14 @@ for (var l = 0; l<tags.length; l++){
 
       }     
         
-      Logger.log("the " + tags[l] + " email being checked is "+senderDetails)
+      //Logger.log("the " + tags[l] + " email being checked is "+senderDetails)
       //k indicates which row in the sheet is being checked for the particular n
         
     //change k back to var k = 0; k < values.length; k++ after testing
             
       for (var k = 0; k < values.length; k++) {
             
-        if ((values[k][1].toString().toLowerCase() + values[k][2].toString().toLowerCase()).includes(name.split(" ")[0]) &&
-        (values[k][1].toString().toLowerCase() + values[k][2].toString().toLowerCase()).includes(name.split(" ")[name.split(" ").length-1]) &&
-        (values[k][0].toString().toLowerCase() !== tags[l].toLowerCase())
-        
-        ||
+        if (
 
         ( values[k][5].toString().toLowerCase() == senderDetails.toString().toLowerCase() && values[k][0].toString().toLowerCase() != tags[l].toLowerCase()))
         
@@ -81,10 +77,24 @@ for (var l = 0; l<tags.length; l++){
           activeSheet.deleteRow([k+2])
           
           //you'll always update the next iteration with a version of the sheet that is consistent with the most recent action of the previous iteration
-          var activeSheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+          var activeSheet = SpreadsheetApp.getActive().getSheetByName("Invitation List");
           var dataRange = activeSheet.getDataRange();
-          var values = dataRange.getValues();                                
+          var values = dataRange.getValues();
+
+          GmailApp.starMessage(message)
+
+          //removing done email, out of the label
+          var label_og = GmailApp.getUserLabelByName(tags[l]);          
+          label_og.removeFromThread(threads[i]);
+
+          //transferring done email to corresponding done folder
+          var label_new = GmailApp.getUserLabelByName(tags[l]+ "_done");
+          label_new.addToThread(threads[i])
+
+
         }
+        
+
       }
     }
   }
@@ -92,88 +102,3 @@ for (var l = 0; l<tags.length; l++){
 }
 
 
-
-
-function bounces(){
-
-
-  var label = GmailApp.getUserLabelByName('Nutan-6th-BB');
-  var threads=label.getThreads();
-  var activeSheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var dataRange = activeSheet.getDataRange();
-  var values = dataRange.getValues();
-    
-
-  Logger.log("there are " + threads.length + " emails in this label")
-  var activeSheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-
-  for(var i = threads.length - 1; i >=0; i--){
-    //storing the row of interest
-    var messages = threads[i].getMessages();
-
-    //n indicates which sender in the thread
-    for (var n = 0; n < messages.length; n++) {
-      var message = messages[n];
-      var senderDetails_raw=message.getPlainBody()      
-      var senderDetails=message.getPlainBody().substring(senderDetails_raw.indexOf("Your message to ")+16,senderDetails_raw.indexOf(" has been blocked."));           
-     
-  
-
-      
-      Logger.log("the " + "BB" + " email being checked is "+senderDetails)
-      //k indicates which row in the sheet is being checked for the particular n
-        
-    //change k back to var k = 0; k < values.length; k++ after testing
-            
-      for (var k = 0; k < values.length; k++) {
-            
-        if (
-
-        ( values[k][5].toString().toLowerCase() == senderDetails.toString().toLowerCase() && values[k][0].toString().toLowerCase() != "BB"))
-        
-        {
-          //j is index that locates the cluster of this label
-
-          loop2:
-          for (var j = 0; j < values.length; j++) {  
-            if (values[j][0].toString().toLowerCase() == "bb" && values[j+1][0].toString().toLowerCase() != "bb") {
-              activeSheet.insertRows(j+2,1)
-              pasterange=[j+2]
-              Logger.log("pasterange is " + pasterange)
-              break loop2;
-            }
-          }
-
-          //since we inserted a new row, we need to add 1 to all the below k
-          //pasterange is used here here because this is the paste range, the place where we inserted a new row under the cluster that this guy belongs to
-          var range = activeSheet.getRange("A"+String(pasterange)+":F"+String(pasterange));
-
-          row = values[k].slice(0,6);
-          row[0]="BB"
-          Logger.log("the row that will be pasted is: " + row)
-          Logger.log("the paste range is: " + values[pasterange] + " of row " + pasterange)
-          
-          range.setValues([row]);        
-          //threads[i].removeLabel(label)
-
-          //deleting the updated row
-          Logger.log("the row that will be deleted is: " + values[k][5] +", with row " + [k])
-          activeSheet.deleteRow([k+2])
-          
-          //you'll always update the next iteration with a version of the sheet that is consistent with the most recent action of the previous iteration
-          var activeSheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-          var dataRange = activeSheet.getDataRange();
-          var values = dataRange.getValues();                                
-        }
-      }
-    }            
-  }
-}
-  
-
-
-
-
-
-
- 

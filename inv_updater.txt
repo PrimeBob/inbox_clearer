@@ -1,7 +1,7 @@
 function getGmailEmails(){
 
 
-var tags= ["Yes","No","OOO","Unsub","Questions"]
+var tags= ["No","OOO","Yes","Unsub"]
 
 
 
@@ -45,7 +45,11 @@ for (var l = 0; l<tags.length; l++){
             
         if (
 
-        ( values[k][5].toString().toLowerCase() == senderDetails.toString().toLowerCase() && values[k][0].toString().toLowerCase() != tags[l].toLowerCase()))
+        ( values[k][5].toString().toLowerCase() == senderDetails.toString().toLowerCase() && 
+        values[k][0].toString().toLowerCase() != tags[l].toLowerCase() && 
+        !values[k][0].toString().toLowerCase().includes("yes") &&
+        !values[k][0].toString().toLowerCase().includes("unsub")                        
+        ))
         
         {
           //j is index that locates the cluster of this label
@@ -72,10 +76,23 @@ for (var l = 0; l<tags.length; l++){
           range.setValues([row]);        
           //threads[i].removeLabel(label)
 
-          //deleting the updated row
-          Logger.log("the row that will be deleted is: " + values[k][5] +", with row " + [k])
-          activeSheet.deleteRow([k+2])
-          
+
+          //if we are moving from top to bottom (as opposed to usually it being bottom to top), then this if condition will save us from deleting the wrong row
+          if (k>j+2){    
+            //deleting the updated row
+            Logger.log("the row that will be deleted is: " + values[k][5] +", with row " + [k])
+            activeSheet.deleteRow([k+2])
+            }
+          else if (k<j+2){
+            //deleting the updated row
+            Logger.log("the row that will be deleted is: " + values[k][5] +", with row " + [k])
+            activeSheet.deleteRow([k+1])
+          }
+
+
+
+
+
           //you'll always update the next iteration with a version of the sheet that is consistent with the most recent action of the previous iteration
           var activeSheet = SpreadsheetApp.getActive().getSheetByName("Invitation List");
           var dataRange = activeSheet.getDataRange();
@@ -100,5 +117,4 @@ for (var l = 0; l<tags.length; l++){
   }
 }
 }
-
 

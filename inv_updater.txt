@@ -1,9 +1,9 @@
 function getGmailEmails(){
 
 
-var tags= ["No","OOO","Yes","Unsub"]
+var tags= ["No","OOO","Questions","Yes","Unsub"]
 
-
+//
 
 
 for (var l = 0; l<tags.length; l++){
@@ -48,6 +48,8 @@ for (var l = 0; l<tags.length; l++){
         ( values[k][5].toString().toLowerCase() == senderDetails.toString().toLowerCase() && 
         values[k][0].toString().toLowerCase() != tags[l].toLowerCase() && 
         !values[k][0].toString().toLowerCase().includes("yes") &&
+        !values[k][0].toString().toLowerCase().includes("rec") &&
+        !values[k][0].toString().toLowerCase().includes("rego") &&
         !values[k][0].toString().toLowerCase().includes("unsub")                        
         ))
         

@@ -1,0 +1,3 @@
+-This program updates the status of invited guests in a google sheet (usually the RSVP list of a particular event)
+-Based on the reply of an invited guest, the email is labelled manually (e.g. Yes, No, OOO, Unsub, Tentative), this program update the status of the invited guest
+and move said guests to the top of the sheet
